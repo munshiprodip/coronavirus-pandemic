@@ -1,23 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import "./App.css";
+import Countries from "./components/Countries/Countries";
+import Header from "./components/Header/Header";
+import Home from "./components/Home/Home";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+  const [allCountries, setAllCountries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState("home");
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  console.log(allCountries);
+
+  const loadData = async () => {
+    try {
+      const data = await axios.get(
+        "https://coronavirus-19-api.herokuapp.com/countries"
+      );
+      setAllCountries(data.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return isLoading ? (
+    <div>Loading...</div>
+  ) : (
+    <div className="container mx-auto">
+      <Header setPage={setPage} />
+      {page === "home" && <Home allCountries={allCountries} />}
+      {page === "allCountries" && <Countries allCountries={allCountries} />}
     </div>
   );
 }
